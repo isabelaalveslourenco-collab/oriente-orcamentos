@@ -68,8 +68,10 @@ export default function OrcamentoForm({ orcamentoInicial, titulo, subtitulo }: P
             alturaM: item.alturaM,
             portasEspelhoQtd: 0,
             ledMetros: 0,
-            tapecaria: false,
-            serralheriaValor: 0
+        tapecaria: false,
+            serralheriaValor: 0,
+            palhaSinteticaValor: 0,
+            palhaNaturalValor: 0
           },
           regiao,
           comissaoRT
