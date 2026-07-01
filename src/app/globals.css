@@ -1,0 +1,80 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+html {
+  font-size: 18px;
+}
+  --oriente-red: #c1121f;
+  --oriente-red-dark: #9e0e19;
+  --oriente-gray: #3f3f3f;
+  --oriente-white: #ffffff;
+}
+html {
+  font-size: 18px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  min-height: 100vh;
+}
+
+/* Scrollbar discreta, alinhada ao estilo clean da marca */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: #d9d9d9;
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #bdbdbd;
+}
+
+/* Foco visível para acessibilidade em toda a aplicação */
+:focus-visible {
+  outline: 2px solid var(--oriente-red);
+  outline-offset: 2px;
+}
+
+@layer components {
+  .input {
+    @apply w-full rounded-xl border border-neutral-300 bg-white px-3.5 py-2.5 text-sm text-oriente-gray
+      placeholder:text-neutral-400 outline-none transition-colors
+      focus:border-oriente-red focus:ring-2 focus:ring-oriente-red/15;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-full bg-oriente-red px-5 py-2.5
+      text-sm font-medium text-white shadow-card transition-colors hover:bg-oriente-red-dark
+      disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-full border border-neutral-300 bg-white px-5 py-2.5
+      text-sm font-medium text-oriente-gray transition-colors hover:bg-neutral-50
+      disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-full px-3.5 py-1.5
+      text-sm font-medium text-oriente-red transition-colors hover:bg-oriente-red/10;
+  }
+
+  .card {
+    @apply bg-white rounded-2xl shadow-card p-5 md:p-6;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
