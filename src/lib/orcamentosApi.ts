@@ -1,6 +1,6 @@
 import { supabase } from "./supabaseClient";
 import { Ambiente, Cliente, ItemOrcamento, Orcamento, Regiao } from "./types";
-import { PRAZO_ENTREGA_PADRAO, calcularTotalOrcamento } from "./pricing";
+import { PRAZO_ENTREGA_PADRAO, FORMA_PAGAMENTO_PADRAO, calcularTotalOrcamento } from "./pricing";
 
 // =========================================================
 // Salvar (criar ou atualizar) um orçamento completo, incluindo
@@ -52,7 +52,8 @@ export async function salvarOrcamento(orcamento: Orcamento): Promise<{ id: strin
         status: orcamento.status,
         observacoes: orcamento.observacoes || null,
         desconto: orcamento.desconto || 0,
-        prazo_entrega: orcamento.prazoEntrega,
+       prazo_entrega: orcamento.prazoEntrega,
+        forma_pagamento: orcamento.formaPagamento,
         possui_arquiteto: orcamento.possuiArquiteto,
         nome_arquiteto: orcamento.nomeArquiteto || null,
         telefone_arquiteto: orcamento.telefoneArquiteto || null,
@@ -265,7 +266,8 @@ export async function carregarOrcamento(id: string): Promise<Orcamento> {
     status: orcData.status,
     observacoes: orcData.observacoes || "",
     desconto: Number(orcData.desconto),
-    prazoEntrega: orcData.prazo_entrega || PRAZO_ENTREGA_PADRAO,
+   prazoEntrega: orcData.prazo_entrega || PRAZO_ENTREGA_PADRAO,
+    formaPagamento: orcData.forma_pagamento || FORMA_PAGAMENTO_PADRAO,
     possuiArquiteto: !!orcData.possui_arquiteto,
     nomeArquiteto: orcData.nome_arquiteto || "",
     telefoneArquiteto: orcData.telefone_arquiteto || "",
