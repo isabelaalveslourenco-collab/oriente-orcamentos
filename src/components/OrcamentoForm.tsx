@@ -5,12 +5,13 @@ import { v4 as uuidv4 } from "uuid";
 import ClienteForm from "@/components/ClienteForm";
 import RegiaoSelector from "@/components/RegiaoSelector";
 import PrazoEntregaSelector from "@/components/PrazoEntregaSelector";
+import FormaPagamentoSelector from "@/components/FormaPagamentoSelector";
 import ArquitetoForm from "@/components/ArquitetoForm";
 import UploadProjeto from "@/components/UploadProjeto";
 import AmbienteCard from "@/components/AmbienteCard";
 import ResumoOrcamento from "@/components/ResumoOrcamento";
 import { Ambiente, AnaliseIAResultado, Cliente, ItemOrcamento, Orcamento, Regiao } from "@/lib/types";
-import { PRAZO_ENTREGA_PADRAO, calcularItem } from "@/lib/pricing";
+import { PRAZO_ENTREGA_PADRAO, FORMA_PAGAMENTO_PADRAO, calcularItem } from "@/lib/pricing";
 import { enviarArquivoProjeto, salvarOrcamento } from "@/lib/orcamentosApi";
 import { exportarOrcamentoPdf } from "@/lib/pdfExport";
 
@@ -29,7 +30,10 @@ export default function OrcamentoForm({ orcamentoInicial, titulo, subtitulo }: P
   const [regiao, setRegiao] = useState<Regiao>(orcamentoInicial?.regiao || "aracatuba");
   const [ambientes, setAmbientes] = useState<Ambiente[]>(orcamentoInicial?.ambientes || []);
   const [desconto, setDesconto] = useState(orcamentoInicial?.desconto || 0);
-  const [prazoEntrega, setPrazoEntrega] = useState(orcamentoInicial?.prazoEntrega || PRAZO_ENTREGA_PADRAO);
+ const [prazoEntrega, setPrazoEntrega] = useState(orcamentoInicial?.prazoEntrega || PRAZO_ENTREGA_PADRAO);
+  const [formaPagamento, setFormaPagamento] = useState(
+    orcamentoInicial?.formaPagamento || FORMA_PAGAMENTO_PADRAO
+  );
   const [possuiArquiteto, setPossuiArquiteto] = useState(orcamentoInicial?.possuiArquiteto || false);
   const [nomeArquiteto, setNomeArquiteto] = useState(orcamentoInicial?.nomeArquiteto || "");
   const [telefoneArquiteto, setTelefoneArquiteto] = useState(orcamentoInicial?.telefoneArquiteto || "");
@@ -105,7 +109,8 @@ export default function OrcamentoForm({ orcamentoInicial, titulo, subtitulo }: P
       status: "finalizado",
       observacoes,
       desconto,
-      prazoEntrega,
+   prazoEntrega,
+      formaPagamento,
       possuiArquiteto,
       nomeArquiteto: possuiArquiteto ? nomeArquiteto : "",
       telefoneArquiteto: possuiArquiteto ? telefoneArquiteto : "",
@@ -192,6 +197,7 @@ export default function OrcamentoForm({ orcamentoInicial, titulo, subtitulo }: P
         <ClienteForm cliente={cliente} onChange={setCliente} />
         <RegiaoSelector regiao={regiao} onChange={setRegiao} />
         <PrazoEntregaSelector prazoEntrega={prazoEntrega} onChange={setPrazoEntrega} />
+        <FormaPagamentoSelector formaPagamento={formaPagamento} onChange={setFormaPagamento} />
         <ArquitetoForm
           possuiArquiteto={possuiArquiteto}
           nomeArquiteto={nomeArquiteto}
