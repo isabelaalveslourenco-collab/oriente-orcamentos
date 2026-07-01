@@ -131,7 +131,9 @@ export async function salvarOrcamento(orcamento: Orcamento): Promise<{ id: strin
         led_valor: item.ledValor,
         tapecaria: item.tapecaria,
         tapecaria_valor: item.tapecariaValor,
-        serralheria_valor: item.serralheriaValor,
+       serralheria_valor: item.serralheriaValor,
+        palha_sintetica_valor: item.palhaSinteticaValor,
+        palha_natural_valor: item.palhaNaturalValor,
         valor_total: item.valorTotal,
         ordem
       }));
