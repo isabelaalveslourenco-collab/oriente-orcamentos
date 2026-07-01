@@ -13,6 +13,11 @@ export type TipoAcabamento =
   | "laqueado"
   | "cabeceira_mdf";
 
+export type FormaPagamento =
+  | "entrada_40_3x"
+  | "entrada_40_2x"
+  | "entrada_50_entrega_50";
+
 export interface Cliente {
   id?: string;
   nome: string;
@@ -47,4 +52,44 @@ export interface ItemOrcamento {
   valorTotal: number; // valorBase + adicionais
 }
 
-export interface Ambiente
+export interface Ambiente {
+  id: string;
+  nome: string;
+  itens: ItemOrcamento[];
+}
+
+export interface Orcamento {
+  id?: string;
+  numero?: number;
+  cliente: Cliente;
+  regiao: Regiao;
+  status: "rascunho" | "finalizado" | "cancelado";
+  observacoes?: string;
+  desconto: number;
+  prazoEntrega: string;
+  formaPagamento: FormaPagamento;
+  possuiArquiteto: boolean;
+  nomeArquiteto?: string;
+  telefoneArquiteto?: string;
+  comissaoRT: number; // percentual de RT (0, 3, 10 ou 13). Só relevante se possuiArquiteto = true.
+  ambientes: Ambiente[];
+  arquivoProjetoUrl?: string;
+  valorTotal: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+// Estrutura que a IA deve retornar ao analisar um projeto anexado
+export interface AnaliseIAResultado {
+  ambientes: {
+    nome: string;
+    itens: {
+      descricao: string;
+      tipoAcabamentoSugerido: TipoAcabamento;
+      larguraM: number;
+      alturaM: number;
+      observacao?: string;
+    }[];
+  }[];
+  resumo: string;
+}
