@@ -206,6 +206,8 @@ export interface EntradaCalculoItem {
   tapecaria?: boolean;
   tapecariaValorPersonalizado?: number; // obrigatório em SP (editável)
   serralheriaValor?: number;
+  palhaSinteticaValor?: number;
+  palhaNaturalValor?: number;
 }
 
 export function calcularItem(
@@ -238,8 +240,12 @@ export function calcularItem(
 
   const serralheriaValor = Number((entrada.serralheriaValor || 0).toFixed(2));
 
+  const palhaSinteticaValor = Number((entrada.palhaSinteticaValor || 0).toFixed(2));
+  const palhaNaturalValor = Number((entrada.palhaNaturalValor || 0).toFixed(2));
+
   const subtotalSemComissao =
-    valorBase + portasEspelhoValor + ledValor + tapecariaValor + serralheriaValor;
+    valorBase + portasEspelhoValor + ledValor + tapecariaValor + serralheriaValor +
+    palhaSinteticaValor + palhaNaturalValor;
 
   // A comissão de RT (reserva técnica do arquiteto) é distribuída proporcionalmente
   // dentro do próprio valor do item — não aparece como uma linha separada em lugar
@@ -265,6 +271,8 @@ export function calcularItem(
     tapecaria,
     tapecariaValor,
     serralheriaValor,
+    palhaSinteticaValor,
+    palhaNaturalValor,
     valorTotal
   };
 }
