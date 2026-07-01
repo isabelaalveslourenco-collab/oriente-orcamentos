@@ -25,8 +25,10 @@ export default function AmbienteCard({ ambiente, regiao, comissaoRT, onChange, o
         alturaM: 0.7,
         portasEspelhoQtd: 0,
         ledMetros: 0,
-        tapecaria: false,
-        serralheriaValor: 0
+     tapecaria: false,
+        serralheriaValor: 0,
+        palhaSinteticaValor: 0,
+        palhaNaturalValor: 0
       },
       regiao,
       comissaoRT
