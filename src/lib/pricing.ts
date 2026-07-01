@@ -1,4 +1,4 @@
-import { ItemOrcamento, Regiao, TipoAcabamento, Ambiente } from "./types";
+import { ItemOrcamento, Regiao, TipoAcabamento, Ambiente, FormaPagamento } from "./types";
 
 // =========================================================
 // TABELA DE PREÇOS — regra de negócio oficial da Oriente Móveis
@@ -135,6 +135,20 @@ export const PRAZO_ENTREGA_OPCOES: string[] = [
 ];
 
 export const PRAZO_ENTREGA_PADRAO = "30 dias corridos";
+
+export interface OpcaoFormaPagamento {
+  value: FormaPagamento;
+  label: string;
+}
+
+export const FORMA_PAGAMENTO_OPCOES: OpcaoFormaPagamento[] = [
+  { value: "entrada_40_3x", label: "40% de entrada + restante em 3x" },
+  { value: "entrada_40_2x", label: "40% de entrada + restante em 2x" },
+  { value: "entrada_50_entrega_50", label: "50% de entrada + 50% na entrega" }
+];
+
+export const FORMA_PAGAMENTO_PADRAO: FormaPagamento = "entrada_40_3x";
+
 
 export interface OpcaoComissaoRT {
   value: number;
@@ -292,4 +306,33 @@ export function calcularTotalOrcamento(ambientes: Ambiente[], desconto: number =
 
 export function formatarMoeda(valor: number): string {
   return valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+}
+
+// =========================================================
+// CONDIÇÕES DE PAGAMENTO
+// =========================================================
+
+export interface CondicaoPagamento {
+  texto: string; // descrição pronta para exibir no PDF/tela
+}
+
+export function calcularCondicaoPagamento(
+  formaPagamento: FormaPagamento,
+  total: number
+): CondicaoPagamento {
+  if (formaPagamento === "entrada_50_entrega_50") {
+    const valorEntrada = Number((total * 0.5).toFixed(2));
+    const valorEntrega = Number((total - valorEntrada).toFixed(2));
+    return {
+      texto: `Entrada de 50% (${formatarMoeda(valorEntrada)}) + 50% na entrega (${formatarMoeda(valorEntrega)})`
+    };
+  }
+
+  const numParcelas = formaPagamento === "entrada_40_2x" ? 2 : 3;
+  const valorEntrada = Number((total * 0.4).toFixed(2));
+  const valorSaldo = Number((total - valorEntrada).toFixed(2));
+  const valorParcela = Number((valorSaldo / numParcelas).toFixed(2));
+  return {
+    texto: `Entrada de 40% (${formatarMoeda(valorEntrada)}) + saldo em ${numParcelas}x de ${formatarMoeda(valorParcela)}`
+  };
 }
