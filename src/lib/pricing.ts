@@ -158,6 +158,7 @@ export interface OpcaoComissaoRT {
 export const COMISSAO_RT_OPCOES: OpcaoComissaoRT[] = [
   { value: 0, label: "Sem comissão" },
   { value: 3, label: "3%" },
+  { value: 5, label: "5%" },
   { value: 10, label: "10%" },
   { value: 13, label: "13%" }
 ];
