@@ -54,10 +54,12 @@ export async function salvarOrcamento(orcamento: Orcamento): Promise<{ id: strin
         desconto: orcamento.desconto || 0,
        prazo_entrega: orcamento.prazoEntrega,
         forma_pagamento: orcamento.formaPagamento,
-        possui_arquiteto: orcamento.possuiArquiteto,
+      possui_arquiteto: orcamento.possuiArquiteto,
         nome_arquiteto: orcamento.nomeArquiteto || null,
         telefone_arquiteto: orcamento.telefoneArquiteto || null,
         comissao_rt: orcamento.comissaoRT || 0,
+        nome_indicacao: orcamento.nomeIndicacao || null,
+        comissao_indicacao: orcamento.comissaoIndicacao || 0,
         valor_total: valorTotal,
         arquivo_projeto_url: orcamento.arquivoProjetoUrl || null
       })
@@ -76,10 +78,12 @@ export async function salvarOrcamento(orcamento: Orcamento): Promise<{ id: strin
         observacoes: orcamento.observacoes || null,
         desconto: orcamento.desconto || 0,
         prazo_entrega: orcamento.prazoEntrega,
-        possui_arquiteto: orcamento.possuiArquiteto,
+       possui_arquiteto: orcamento.possuiArquiteto,
         nome_arquiteto: orcamento.nomeArquiteto || null,
         telefone_arquiteto: orcamento.telefoneArquiteto || null,
         comissao_rt: orcamento.comissaoRT || 0,
+        nome_indicacao: orcamento.nomeIndicacao || null,
+        comissao_indicacao: orcamento.comissaoIndicacao || 0,
         valor_total: valorTotal,
         arquivo_projeto_url: orcamento.arquivoProjetoUrl || null
       })
@@ -271,7 +275,9 @@ export async function carregarOrcamento(id: string): Promise<Orcamento> {
     possuiArquiteto: !!orcData.possui_arquiteto,
     nomeArquiteto: orcData.nome_arquiteto || "",
     telefoneArquiteto: orcData.telefone_arquiteto || "",
-    comissaoRT: Number(orcData.comissao_rt) || 0,
+     comissaoRT: Number(orcData.comissao_rt) || 0,
+    nomeIndicacao: orcData.nome_indicacao || "",
+    comissaoIndicacao: Number(orcData.comissao_indicacao) || 0,
     ambientes,
     arquivoProjetoUrl: orcData.arquivo_projeto_url || undefined,
     valorTotal: Number(orcData.valor_total),
