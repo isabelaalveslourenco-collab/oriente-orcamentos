@@ -85,7 +85,7 @@ export default function OrcamentoForm({ orcamentoInicial, titulo, subtitulo }: P
             palhaNaturalValor: 0
           },
           regiao,
-          comissaoRT
+        comissaoTotal
         )
       )
     }));
@@ -121,7 +121,9 @@ export default function OrcamentoForm({ orcamentoInicial, titulo, subtitulo }: P
       possuiArquiteto,
       nomeArquiteto: possuiArquiteto ? nomeArquiteto : "",
       telefoneArquiteto: possuiArquiteto ? telefoneArquiteto : "",
-      comissaoRT: possuiArquiteto ? comissaoRT : 0,
+    comissaoRT: possuiArquiteto ? comissaoRT : 0,
+      nomeIndicacao,
+      comissaoIndicacao,
       ambientes,
       valorTotal: 0
     };
@@ -213,7 +215,13 @@ export default function OrcamentoForm({ orcamentoInicial, titulo, subtitulo }: P
           onChangePossui={setPossuiArquiteto}
           onChangeNome={setNomeArquiteto}
           onChangeTelefone={setTelefoneArquiteto}
-          onChangeComissaoRT={setComissaoRT}
+     onChangeComissaoRT={setComissaoRT}
+        />
+        <IndicacaoForm
+          nomeIndicacao={nomeIndicacao}
+          comissaoIndicacao={comissaoIndicacao}
+          onChangeNome={setNomeIndicacao}
+          onChangeComissao={setComissaoIndicacao}
         />
         <UploadProjeto onAnalise={aplicarAnaliseIA} onArquivoSelecionado={setArquivoProjeto} />
 
@@ -239,7 +247,7 @@ export default function OrcamentoForm({ orcamentoInicial, titulo, subtitulo }: P
               key={ambiente.id}
               ambiente={ambiente}
               regiao={regiao}
-              comissaoRT={comissaoRT}
+              comissaoRT={comissaoTotal}
               onChange={atualizarAmbiente}
               onRemover={() => removerAmbiente(ambiente.id)}
             />
