@@ -7,6 +7,7 @@ import RegiaoSelector from "@/components/RegiaoSelector";
 import PrazoEntregaSelector from "@/components/PrazoEntregaSelector";
 import FormaPagamentoSelector from "@/components/FormaPagamentoSelector";
 import ArquitetoForm from "@/components/ArquitetoForm";
+import IndicacaoForm from "@/components/IndicacaoForm";
 import UploadProjeto from "@/components/UploadProjeto";
 import AmbienteCard from "@/components/AmbienteCard";
 import ResumoOrcamento from "@/components/ResumoOrcamento";
@@ -37,13 +38,19 @@ export default function OrcamentoForm({ orcamentoInicial, titulo, subtitulo }: P
   const [possuiArquiteto, setPossuiArquiteto] = useState(orcamentoInicial?.possuiArquiteto || false);
   const [nomeArquiteto, setNomeArquiteto] = useState(orcamentoInicial?.nomeArquiteto || "");
   const [telefoneArquiteto, setTelefoneArquiteto] = useState(orcamentoInicial?.telefoneArquiteto || "");
-  const [comissaoRT, setComissaoRT] = useState(orcamentoInicial?.comissaoRT || 0);
+   const [comissaoRT, setComissaoRT] = useState(orcamentoInicial?.comissaoRT || 0);
+  const [nomeIndicacao, setNomeIndicacao] = useState(orcamentoInicial?.nomeIndicacao || "");
+  const [comissaoIndicacao, setComissaoIndicacao] = useState(orcamentoInicial?.comissaoIndicacao || 0);
   const [observacoes, setObservacoes] = useState(orcamentoInicial?.observacoes || "");
   const [arquivoProjeto, setArquivoProjeto] = useState<File | null>(null);
 
   const [salvando, setSalvando] = useState(false);
   const [exportando, setExportando] = useState(false);
   const [mensagem, setMensagem] = useState<{ tipo: "sucesso" | "erro"; texto: string } | null>(null);
+
+  // Soma RT (arquiteto) + comissão de indicação — ambas embutidas no preço final,
+  // mas só o nome do arquiteto aparece no PDF.
+  const comissaoTotal = comissaoRT + comissaoIndicacao;
 
   function adicionarAmbiente() {
     setAmbientes((prev) => [...prev, { id: uuidv4(), nome: "Novo ambiente", itens: [] }]);
