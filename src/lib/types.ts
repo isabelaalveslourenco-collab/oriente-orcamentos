@@ -13,6 +13,11 @@ export type TipoAcabamento =
   | "laqueado"
   | "cabeceira_mdf";
 
+export type FormaPagamento =
+  | "entrada_40_3x"
+  | "entrada_40_2x"
+  | "entrada_50_entrega_50";
+
 export interface Cliente {
   id?: string;
   nome: string;
@@ -62,10 +67,13 @@ export interface Orcamento {
   observacoes?: string;
   desconto: number;
   prazoEntrega: string;
+  formaPagamento: FormaPagamento;
   possuiArquiteto: boolean;
   nomeArquiteto?: string;
   telefoneArquiteto?: string;
-  comissaoRT: number; // percentual de RT (0, 3, 10 ou 13). Só relevante se possuiArquiteto = true.
+    comissaoRT: number; // percentual de RT (0, 3, 5, 10 ou 13). Só relevante se possuiArquiteto = true.
+  nomeIndicacao?: string; // quem indicou o cliente/projeto — uso interno, nunca aparece no PDF
+  comissaoIndicacao: number; // percentual de comissão da indicação — uso interno, nunca aparece no PDF
   ambientes: Ambiente[];
   arquivoProjetoUrl?: string;
   valorTotal: number;

@@ -22,6 +22,8 @@ export default function ItemRow({ item, regiao, comissaoRT, onChange, onRemover 
   const [aberto, setAberto] = useState(false);
   const [serralheriaAtiva, setSerralheriaAtiva] = useState(item.serralheriaValor > 0);
   const [tapecariaAtiva, setTapecariaAtiva] = useState(item.tapecaria);
+  const [palhaSinteticaAtiva, setPalhaSinteticaAtiva] = useState(item.palhaSinteticaValor > 0);
+  const [palhaNaturalAtiva, setPalhaNaturalAtiva] = useState(item.palhaNaturalValor > 0);
   const faixa = TABELA_PRECOS[regiao][item.tipoAcabamento];
   const faixaTemVariacao = faixa.valorMin !== faixa.valorMax || faixa.editavel;
   const adicionaisRegiao = ADICIONAIS[regiao];
@@ -38,6 +40,8 @@ export default function ItemRow({ item, regiao, comissaoRT, onChange, onRemover 
     tapecaria: boolean;
     tapecariaValorPersonalizado: number;
     serralheriaValor: number;
+    palhaSinteticaValor: number;
+    palhaNaturalValor: number;
   }>) {
     const novoItem = calcularItem(
       {
@@ -56,7 +60,9 @@ export default function ItemRow({ item, regiao, comissaoRT, onChange, onRemover 
         tapecariaValorPersonalizado:
           campos.tapecariaValorPersonalizado ??
           (adicionaisRegiao.tapecariaFixa === null ? item.tapecariaValor : undefined),
-        serralheriaValor: campos.serralheriaValor ?? item.serralheriaValor
+        serralheriaValor: campos.serralheriaValor ?? item.serralheriaValor,
+        palhaSinteticaValor: campos.palhaSinteticaValor ?? item.palhaSinteticaValor,
+        palhaNaturalValor: campos.palhaNaturalValor ?? item.palhaNaturalValor
       },
       regiao,
       comissaoRT
@@ -247,6 +253,62 @@ export default function ItemRow({ item, regiao, comissaoRT, onChange, onRemover 
                   className="input mt-2"
                   value={item.serralheriaValor}
                   onChange={(e) => recalcular({ serralheriaValor: parseFloat(e.target.value) || 0 })}
+                  placeholder="0,00"
+                  autoFocus
+                />
+              </Campo>
+            )}
+
+            <label className="flex items-center gap-2 mt-4">
+              <input
+                type="checkbox"
+                checked={palhaSinteticaAtiva}
+                onChange={(e) => {
+                  const ativo = e.target.checked;
+                  setPalhaSinteticaAtiva(ativo);
+                  if (!ativo) recalcular({ palhaSinteticaValor: 0 });
+                }}
+                className="h-4 w-4 accent-oriente-red"
+              />
+              <span className="text-sm text-oriente-gray">Palha sintética</span>
+            </label>
+
+            {palhaSinteticaAtiva && (
+              <Campo label="Valor da palha sintética (R$)">
+                <input
+                  type="number"
+                  min={0}
+                  className="input mt-2"
+                  value={item.palhaSinteticaValor}
+                  onChange={(e) => recalcular({ palhaSinteticaValor: parseFloat(e.target.value) || 0 })}
+                  placeholder="0,00"
+                  autoFocus
+                />
+              </Campo>
+            )}
+
+            <label className="flex items-center gap-2 mt-4">
+              <input
+                type="checkbox"
+                checked={palhaNaturalAtiva}
+                onChange={(e) => {
+                  const ativo = e.target.checked;
+                  setPalhaNaturalAtiva(ativo);
+                  if (!ativo) recalcular({ palhaNaturalValor: 0 });
+                }}
+                className="h-4 w-4 accent-oriente-red"
+              />
+              <span className="text-sm text-oriente-gray">Palha natural</span>
+            </label>
+
+            {palhaNaturalAtiva && (
+              <Campo label="Valor da palha natural (R$)">
+                <input
+                  type="number"
+                  min={0}
+                  className="input mt-2"
+                  value={item.palhaNaturalValor}
+                  onChange={(e) => recalcular({ palhaNaturalValor: parseFloat(e.target.value) || 0 })}
                   placeholder="0,00"
                   autoFocus
                 />

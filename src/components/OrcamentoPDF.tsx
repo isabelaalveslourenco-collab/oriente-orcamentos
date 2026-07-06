@@ -1,7 +1,7 @@
 import { Document, Page, Text, View, StyleSheet, Image } from "@react-pdf/renderer";
 import { Orcamento } from "@/lib/types";
 import { TABELA_PRECOS } from "@/lib/pricing";
-import { calcularSubtotalAmbiente, calcularTotalOrcamento, formatarMoeda } from "@/lib/pricing";
+import { calcularSubtotalAmbiente, calcularTotalOrcamento, calcularCondicaoPagamento, formatarMoeda } from "@/lib/pricing";
 
 const CORES = {
   vermelho: "#C1121F",
@@ -149,7 +149,7 @@ function descricaoAdicionais(item: Orcamento["ambientes"][number]["itens"][numbe
   const partes: string[] = [];
   if (item.portasEspelhoQtd > 0) partes.push(`${item.portasEspelhoQtd}x porta espelho`);
   if (item.ledMetros > 0) partes.push(`LED ${item.ledMetros}m`);
-  if (item.tapecaria) partes.push("Tapeçaria");
+ if (item.tapecaria) partes.push("Tapeçaria");
   if (item.serralheriaValor > 0) partes.push("Serralheria");
   if (item.palhaSinteticaValor > 0) partes.push("Palha sintética");
   if (item.palhaNaturalValor > 0) partes.push("Palha natural");
@@ -165,9 +165,7 @@ export default function OrcamentoPDF({ orcamento }: { orcamento: Orcamento }) {
   dataValidade.setDate(dataValidade.getDate() + 15);
   const dataValidadeFormatada = dataValidade.toLocaleDateString("pt-BR");
 
-  const valorEntrada = Number((total * 0.4).toFixed(2));
-  const valorSaldo = Number((total - valorEntrada).toFixed(2));
-  const valorParcela = Number((valorSaldo / 3).toFixed(2));
+  const condicaoPagamento = calcularCondicaoPagamento(orcamento.formaPagamento, total);
 
   return (
     <Document title={`Orcamento-OrienteMoveis-${orcamento.numero || ""}`}>
@@ -263,9 +261,8 @@ export default function OrcamentoPDF({ orcamento }: { orcamento: Orcamento }) {
         {/* Condições de pagamento, prazo e validade */}
         <View style={styles.condicoesBox}>
           <View style={styles.condicaoCard}>
-            <Text style={styles.condicaoTitulo}>Condições de pagamento</Text>
-            <Text style={styles.condicaoTexto}>
-              Entrada de 40% ({formatarMoeda(valorEntrada)}) + saldo em 3x de {formatarMoeda(valorParcela)}
+           <Text style={styles.condicaoTexto}>
+              {condicaoPagamento.texto}
             </Text>
           </View>
           <View style={styles.condicaoCard}>
