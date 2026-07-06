@@ -151,6 +151,8 @@ function descricaoAdicionais(item: Orcamento["ambientes"][number]["itens"][numbe
   if (item.ledMetros > 0) partes.push(`LED ${item.ledMetros}m`);
   if (item.tapecaria) partes.push("Tapeçaria");
   if (item.serralheriaValor > 0) partes.push("Serralheria");
+  if (item.palhaSinteticaValor > 0) partes.push("Palha sintética");
+  if (item.palhaNaturalValor > 0) partes.push("Palha natural");
   return partes.length > 0 ? partes.join(" · ") : "—";
 }
 

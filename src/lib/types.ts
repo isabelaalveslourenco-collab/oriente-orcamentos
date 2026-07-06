@@ -41,6 +41,8 @@ export interface ItemOrcamento {
   tapecaria: boolean;
   tapecariaValor: number;
   serralheriaValor: number;
+  palhaSinteticaValor: number;
+  palhaNaturalValor: number;
 
   valorTotal: number; // valorBase + adicionais
 }

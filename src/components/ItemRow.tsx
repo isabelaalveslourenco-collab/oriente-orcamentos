@@ -32,6 +32,7 @@ export default function ItemRow({ item, regiao, comissaoRT, onChange, onRemover 
     larguraM: number;
     alturaM: number;
     valorUnitarioPersonalizado: number;
+    resetarValorUnitario: boolean;
     portasEspelhoQtd: number;
     ledMetros: number;
     tapecaria: boolean;
@@ -46,7 +47,9 @@ export default function ItemRow({ item, regiao, comissaoRT, onChange, onRemover 
         tipoAcabamento: campos.tipoAcabamento ?? item.tipoAcabamento,
         larguraM: campos.larguraM ?? item.larguraM,
         alturaM: campos.alturaM ?? item.alturaM,
-        valorUnitarioPersonalizado: campos.valorUnitarioPersonalizado ?? item.valorUnitario,
+        valorUnitarioPersonalizado: campos.resetarValorUnitario
+          ? undefined
+          : campos.valorUnitarioPersonalizado ?? item.valorUnitario,
         portasEspelhoQtd: campos.portasEspelhoQtd ?? item.portasEspelhoQtd,
         ledMetros: campos.ledMetros ?? item.ledMetros,
         tapecaria: campos.tapecaria ?? item.tapecaria,
@@ -105,7 +108,12 @@ export default function ItemRow({ item, regiao, comissaoRT, onChange, onRemover 
             <select
               className="input"
               value={item.tipoAcabamento}
-              onChange={(e) => recalcular({ tipoAcabamento: e.target.value as TipoAcabamento })}
+              onChange={(e) =>
+                recalcular({
+                  tipoAcabamento: e.target.value as TipoAcabamento,
+                  resetarValorUnitario: true
+                })
+              }
             >
               {TIPO_ACABAMENTO_OPCOES.map((op) => (
                 <option key={op.value} value={op.value}>

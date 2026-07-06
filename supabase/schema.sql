@@ -68,6 +68,8 @@ create table if not exists itens (
   tapecaria boolean not null default false,
   tapecaria_valor numeric(12,2) not null default 0,
   serralheria_valor numeric(12,2) not null default 0,
+  palha_sintetica_valor numeric(12,2) not null default 0,
+  palha_natural_valor numeric(12,2) not null default 0,
 
   valor_total numeric(12,2) not null default 0,       -- valor_base + adicionais
   ordem integer not null default 0

@@ -1,0 +1,235 @@
+diff --git a/src/components/AmbienteCard.tsx b/src/components/AmbienteCard.tsx
+index 86c286e..bb3cd2e 100644
+--- a/src/components/AmbienteCard.tsx
++++ b/src/components/AmbienteCard.tsx
+@@ -26,7 +26,9 @@ export default function AmbienteCard({ ambiente, regiao, comissaoRT, onChange, o
+         portasEspelhoQtd: 0,
+         ledMetros: 0,
+         tapecaria: false,
+-        serralheriaValor: 0
++        serralheriaValor: 0,
++        palhaSinteticaValor: 0,
++        palhaNaturalValor: 0
+       },
+       regiao,
+       comissaoRT
+diff --git a/src/components/ItemRow.tsx b/src/components/ItemRow.tsx
+index 718f5d4..7a1cce3 100644
+--- a/src/components/ItemRow.tsx
++++ b/src/components/ItemRow.tsx
+@@ -22,6 +22,8 @@ export default function ItemRow({ item, regiao, comissaoRT, onChange, onRemover
+   const [aberto, setAberto] = useState(false);
+   const [serralheriaAtiva, setSerralheriaAtiva] = useState(item.serralheriaValor > 0);
+   const [tapecariaAtiva, setTapecariaAtiva] = useState(item.tapecaria);
++  const [palhaSinteticaAtiva, setPalhaSinteticaAtiva] = useState(item.palhaSinteticaValor > 0);
++  const [palhaNaturalAtiva, setPalhaNaturalAtiva] = useState(item.palhaNaturalValor > 0);
+   const faixa = TABELA_PRECOS[regiao][item.tipoAcabamento];
+   const faixaTemVariacao = faixa.valorMin !== faixa.valorMax || faixa.editavel;
+   const adicionaisRegiao = ADICIONAIS[regiao];
+@@ -37,6 +39,8 @@ export default function ItemRow({ item, regiao, comissaoRT, onChange, onRemover
+     tapecaria: boolean;
+     tapecariaValorPersonalizado: number;
+     serralheriaValor: number;
++    palhaSinteticaValor: number;
++    palhaNaturalValor: number;
+   }>) {
+     const novoItem = calcularItem(
+       {
+@@ -53,7 +57,9 @@ export default function ItemRow({ item, regiao, comissaoRT, onChange, onRemover
+         tapecariaValorPersonalizado:
+           campos.tapecariaValorPersonalizado ??
+           (adicionaisRegiao.tapecariaFixa === null ? item.tapecariaValor : undefined),
+-        serralheriaValor: campos.serralheriaValor ?? item.serralheriaValor
++        serralheriaValor: campos.serralheriaValor ?? item.serralheriaValor,
++        palhaSinteticaValor: campos.palhaSinteticaValor ?? item.palhaSinteticaValor,
++        palhaNaturalValor: campos.palhaNaturalValor ?? item.palhaNaturalValor
+       },
+       regiao,
+       comissaoRT
+@@ -244,6 +250,62 @@ export default function ItemRow({ item, regiao, comissaoRT, onChange, onRemover
+                 />
+               </Campo>
+             )}
++
++            <label className="flex items-center gap-2 mt-4">
++              <input
++                type="checkbox"
++                checked={palhaSinteticaAtiva}
++                onChange={(e) => {
++                  const ativo = e.target.checked;
++                  setPalhaSinteticaAtiva(ativo);
++                  if (!ativo) recalcular({ palhaSinteticaValor: 0 });
++                }}
++                className="h-4 w-4 accent-oriente-red"
++              />
++              <span className="text-sm text-oriente-gray">Palha sintética</span>
++            </label>
++
++            {palhaSinteticaAtiva && (
++              <Campo label="Valor da palha sintética (R$)">
++                <input
++                  type="number"
++                  min={0}
++                  className="input mt-2"
++                  value={item.palhaSinteticaValor}
++                  onChange={(e) => recalcular({ palhaSinteticaValor: parseFloat(e.target.value) || 0 })}
++                  placeholder="0,00"
++                  autoFocus
++                />
++              </Campo>
++            )}
++
++            <label className="flex items-center gap-2 mt-4">
++              <input
++                type="checkbox"
++                checked={palhaNaturalAtiva}
++                onChange={(e) => {
++                  const ativo = e.target.checked;
++                  setPalhaNaturalAtiva(ativo);
++                  if (!ativo) recalcular({ palhaNaturalValor: 0 });
++                }}
++                className="h-4 w-4 accent-oriente-red"
++              />
++              <span className="text-sm text-oriente-gray">Palha natural</span>
++            </label>
++
++            {palhaNaturalAtiva && (
++              <Campo label="Valor da palha natural (R$)">
++                <input
++                  type="number"
++                  min={0}
++                  className="input mt-2"
++                  value={item.palhaNaturalValor}
++                  onChange={(e) => recalcular({ palhaNaturalValor: parseFloat(e.target.value) || 0 })}
++                  placeholder="0,00"
++                  autoFocus
++                />
++              </Campo>
++            )}
+           </div>
+ 
+           <div className="flex items-center justify-between pt-2 border-t border-neutral-200">
+diff --git a/src/components/OrcamentoForm.tsx b/src/components/OrcamentoForm.tsx
+index 55a52c2..4e11411 100644
+--- a/src/components/OrcamentoForm.tsx
++++ b/src/components/OrcamentoForm.tsx
+@@ -69,7 +69,9 @@ export default function OrcamentoForm({ orcamentoInicial, titulo, subtitulo }: P
+             portasEspelhoQtd: 0,
+             ledMetros: 0,
+             tapecaria: false,
+-            serralheriaValor: 0
++            serralheriaValor: 0,
++            palhaSinteticaValor: 0,
++            palhaNaturalValor: 0
+           },
+           regiao,
+           comissaoRT
+diff --git a/src/components/OrcamentoPDF.tsx b/src/components/OrcamentoPDF.tsx
+index 20c9055..51b5da2 100644
+--- a/src/components/OrcamentoPDF.tsx
++++ b/src/components/OrcamentoPDF.tsx
+@@ -151,6 +151,8 @@ function descricaoAdicionais(item: Orcamento["ambientes"][number]["itens"][numbe
+   if (item.ledMetros > 0) partes.push(`LED ${item.ledMetros}m`);
+   if (item.tapecaria) partes.push("Tapeçaria");
+   if (item.serralheriaValor > 0) partes.push("Serralheria");
++  if (item.palhaSinteticaValor > 0) partes.push("Palha sintética");
++  if (item.palhaNaturalValor > 0) partes.push("Palha natural");
+   return partes.length > 0 ? partes.join(" · ") : "—";
+ }
+ 
+diff --git a/src/components/migracao_palha.sql b/src/components/migracao_palha.sql
+new file mode 100644
+index 0000000..a4414f3
+--- /dev/null
++++ b/src/components/migracao_palha.sql
+@@ -0,0 +1,6 @@
++-- Rode isto no SQL Editor do Supabase (uma única vez) para adicionar os
++-- campos de adicional "Palha sintética" e "Palha natural" nos itens.
++
++alter table itens
++  add column if not exists palha_sintetica_valor numeric(12,2) not null default 0,
++  add column if not exists palha_natural_valor numeric(12,2) not null default 0;
+diff --git a/src/lib/orcamentosApi.ts b/src/lib/orcamentosApi.ts
+index 22da796..d07b34b 100644
+--- a/src/lib/orcamentosApi.ts
++++ b/src/lib/orcamentosApi.ts
+@@ -132,6 +132,8 @@ export async function salvarOrcamento(orcamento: Orcamento): Promise<{ id: strin
+         tapecaria: item.tapecaria,
+         tapecaria_valor: item.tapecariaValor,
+         serralheria_valor: item.serralheriaValor,
++        palha_sintetica_valor: item.palhaSinteticaValor,
++        palha_natural_valor: item.palhaNaturalValor,
+         valor_total: item.valorTotal,
+         ordem
+       }));
+@@ -248,6 +250,8 @@ export async function carregarOrcamento(id: string): Promise<Orcamento> {
+           tapecaria: item.tapecaria,
+           tapecariaValor: Number(item.tapecaria_valor),
+           serralheriaValor: Number(item.serralheria_valor),
++          palhaSinteticaValor: Number(item.palha_sintetica_valor ?? 0),
++          palhaNaturalValor: Number(item.palha_natural_valor ?? 0),
+           valorTotal: Number(item.valor_total)
+         })
+       )
+diff --git a/src/lib/pricing.ts b/src/lib/pricing.ts
+index a86581e..7015937 100644
+--- a/src/lib/pricing.ts
++++ b/src/lib/pricing.ts
+@@ -206,6 +206,8 @@ export interface EntradaCalculoItem {
+   tapecaria?: boolean;
+   tapecariaValorPersonalizado?: number; // obrigatório em SP (editável)
+   serralheriaValor?: number;
++  palhaSinteticaValor?: number;
++  palhaNaturalValor?: number;
+ }
+ 
+ export function calcularItem(
+@@ -238,8 +240,12 @@ export function calcularItem(
+ 
+   const serralheriaValor = Number((entrada.serralheriaValor || 0).toFixed(2));
+ 
++  const palhaSinteticaValor = Number((entrada.palhaSinteticaValor || 0).toFixed(2));
++  const palhaNaturalValor = Number((entrada.palhaNaturalValor || 0).toFixed(2));
++
+   const subtotalSemComissao =
+-    valorBase + portasEspelhoValor + ledValor + tapecariaValor + serralheriaValor;
++    valorBase + portasEspelhoValor + ledValor + tapecariaValor + serralheriaValor +
++    palhaSinteticaValor + palhaNaturalValor;
+ 
+   // A comissão de RT (reserva técnica do arquiteto) é distribuída proporcionalmente
+   // dentro do próprio valor do item — não aparece como uma linha separada em lugar
+@@ -265,6 +271,8 @@ export function calcularItem(
+     tapecaria,
+     tapecariaValor,
+     serralheriaValor,
++    palhaSinteticaValor,
++    palhaNaturalValor,
+     valorTotal
+   };
+ }
+diff --git a/src/lib/types.ts b/src/lib/types.ts
+index 94259ac..da3cfd3 100644
+--- a/src/lib/types.ts
++++ b/src/lib/types.ts
+@@ -41,6 +41,8 @@ export interface ItemOrcamento {
+   tapecaria: boolean;
+   tapecariaValor: number;
+   serralheriaValor: number;
++  palhaSinteticaValor: number;
++  palhaNaturalValor: number;
+ 
+   valorTotal: number; // valorBase + adicionais
+ }
+diff --git a/supabase/schema.sql b/supabase/schema.sql
+index a0d1613..098cdab 100644
+--- a/supabase/schema.sql
++++ b/supabase/schema.sql
+@@ -68,6 +68,8 @@ create table if not exists itens (
+   tapecaria boolean not null default false,
+   tapecaria_valor numeric(12,2) not null default 0,
+   serralheria_valor numeric(12,2) not null default 0,
++  palha_sintetica_valor numeric(12,2) not null default 0,
++  palha_natural_valor numeric(12,2) not null default 0,
+ 
+   valor_total numeric(12,2) not null default 0,       -- valor_base + adicionais
+   ordem integer not null default 0

@@ -132,6 +132,8 @@ export async function salvarOrcamento(orcamento: Orcamento): Promise<{ id: strin
         tapecaria: item.tapecaria,
         tapecaria_valor: item.tapecariaValor,
         serralheria_valor: item.serralheriaValor,
+        palha_sintetica_valor: item.palhaSinteticaValor,
+        palha_natural_valor: item.palhaNaturalValor,
         valor_total: item.valorTotal,
         ordem
       }));
@@ -248,6 +250,8 @@ export async function carregarOrcamento(id: string): Promise<Orcamento> {
           tapecaria: item.tapecaria,
           tapecariaValor: Number(item.tapecaria_valor),
           serralheriaValor: Number(item.serralheria_valor),
+          palhaSinteticaValor: Number(item.palha_sintetica_valor ?? 0),
+          palhaNaturalValor: Number(item.palha_natural_valor ?? 0),
           valorTotal: Number(item.valor_total)
         })
       )
