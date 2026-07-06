@@ -1,6 +1,6 @@
 import { supabase } from "./supabaseClient";
 import { Ambiente, Cliente, ItemOrcamento, Orcamento, Regiao } from "./types";
-import { PRAZO_ENTREGA_PADRAO, calcularTotalOrcamento } from "./pricing";
+import { FORMA_PAGAMENTO_PADRAO, PRAZO_ENTREGA_PADRAO, calcularTotalOrcamento } from "./pricing";
 
 // =========================================================
 // Salvar (criar ou atualizar) um orçamento completo, incluindo
@@ -57,6 +57,9 @@ export async function salvarOrcamento(orcamento: Orcamento): Promise<{ id: strin
         nome_arquiteto: orcamento.nomeArquiteto || null,
         telefone_arquiteto: orcamento.telefoneArquiteto || null,
         comissao_rt: orcamento.comissaoRT || 0,
+        forma_pagamento: orcamento.formaPagamento,
+        nome_indicacao: orcamento.nomeIndicacao || null,
+        comissao_indicacao: orcamento.comissaoIndicacao || 0,
         valor_total: valorTotal,
         arquivo_projeto_url: orcamento.arquivoProjetoUrl || null
       })
@@ -79,6 +82,9 @@ export async function salvarOrcamento(orcamento: Orcamento): Promise<{ id: strin
         nome_arquiteto: orcamento.nomeArquiteto || null,
         telefone_arquiteto: orcamento.telefoneArquiteto || null,
         comissao_rt: orcamento.comissaoRT || 0,
+        forma_pagamento: orcamento.formaPagamento,
+        nome_indicacao: orcamento.nomeIndicacao || null,
+        comissao_indicacao: orcamento.comissaoIndicacao || 0,
         valor_total: valorTotal,
         arquivo_projeto_url: orcamento.arquivoProjetoUrl || null
       })
@@ -250,8 +256,8 @@ export async function carregarOrcamento(id: string): Promise<Orcamento> {
           tapecaria: item.tapecaria,
           tapecariaValor: Number(item.tapecaria_valor),
           serralheriaValor: Number(item.serralheria_valor),
-          palhaSinteticaValor: Number(item.palha_sintetica_valor ?? 0),
-          palhaNaturalValor: Number(item.palha_natural_valor ?? 0),
+          palhaSinteticaValor: Number(item.palha_sintetica_valor) || 0,
+          palhaNaturalValor: Number(item.palha_natural_valor) || 0,
           valorTotal: Number(item.valor_total)
         })
       )
@@ -270,6 +276,9 @@ export async function carregarOrcamento(id: string): Promise<Orcamento> {
     nomeArquiteto: orcData.nome_arquiteto || "",
     telefoneArquiteto: orcData.telefone_arquiteto || "",
     comissaoRT: Number(orcData.comissao_rt) || 0,
+    formaPagamento: orcData.forma_pagamento || FORMA_PAGAMENTO_PADRAO,
+    nomeIndicacao: orcData.nome_indicacao || "",
+    comissaoIndicacao: Number(orcData.comissao_indicacao) || 0,
     ambientes,
     arquivoProjetoUrl: orcData.arquivo_projeto_url || undefined,
     valorTotal: Number(orcData.valor_total),

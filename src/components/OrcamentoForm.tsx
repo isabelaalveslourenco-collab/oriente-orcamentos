@@ -5,12 +5,14 @@ import { v4 as uuidv4 } from "uuid";
 import ClienteForm from "@/components/ClienteForm";
 import RegiaoSelector from "@/components/RegiaoSelector";
 import PrazoEntregaSelector from "@/components/PrazoEntregaSelector";
+import FormaPagamentoSelector from "@/components/FormaPagamentoSelector";
 import ArquitetoForm from "@/components/ArquitetoForm";
+import IndicacaoForm from "@/components/IndicacaoForm";
 import UploadProjeto from "@/components/UploadProjeto";
 import AmbienteCard from "@/components/AmbienteCard";
 import ResumoOrcamento from "@/components/ResumoOrcamento";
-import { Ambiente, AnaliseIAResultado, Cliente, ItemOrcamento, Orcamento, Regiao } from "@/lib/types";
-import { PRAZO_ENTREGA_PADRAO, calcularItem } from "@/lib/pricing";
+import { Ambiente, AnaliseIAResultado, Cliente, FormaPagamento, ItemOrcamento, Orcamento, Regiao } from "@/lib/types";
+import { FORMA_PAGAMENTO_PADRAO, PRAZO_ENTREGA_PADRAO, calcularItem } from "@/lib/pricing";
 import { enviarArquivoProjeto, salvarOrcamento } from "@/lib/orcamentosApi";
 import { exportarOrcamentoPdf } from "@/lib/pdfExport";
 
@@ -30,16 +32,24 @@ export default function OrcamentoForm({ orcamentoInicial, titulo, subtitulo }: P
   const [ambientes, setAmbientes] = useState<Ambiente[]>(orcamentoInicial?.ambientes || []);
   const [desconto, setDesconto] = useState(orcamentoInicial?.desconto || 0);
   const [prazoEntrega, setPrazoEntrega] = useState(orcamentoInicial?.prazoEntrega || PRAZO_ENTREGA_PADRAO);
+  const [formaPagamento, setFormaPagamento] = useState<FormaPagamento>(
+    orcamentoInicial?.formaPagamento || FORMA_PAGAMENTO_PADRAO
+  );
   const [possuiArquiteto, setPossuiArquiteto] = useState(orcamentoInicial?.possuiArquiteto || false);
   const [nomeArquiteto, setNomeArquiteto] = useState(orcamentoInicial?.nomeArquiteto || "");
   const [telefoneArquiteto, setTelefoneArquiteto] = useState(orcamentoInicial?.telefoneArquiteto || "");
   const [comissaoRT, setComissaoRT] = useState(orcamentoInicial?.comissaoRT || 0);
+  const [nomeIndicacao, setNomeIndicacao] = useState(orcamentoInicial?.nomeIndicacao || "");
+  const [comissaoIndicacao, setComissaoIndicacao] = useState(orcamentoInicial?.comissaoIndicacao || 0);
   const [observacoes, setObservacoes] = useState(orcamentoInicial?.observacoes || "");
   const [arquivoProjeto, setArquivoProjeto] = useState<File | null>(null);
 
   const [salvando, setSalvando] = useState(false);
   const [exportando, setExportando] = useState(false);
   const [mensagem, setMensagem] = useState<{ tipo: "sucesso" | "erro"; texto: string } | null>(null);
+
+  // Comissão total embutida nos itens: RT do arquiteto + comissão de indicação, somadas.
+  const comissaoTotal = (possuiArquiteto ? comissaoRT : 0) + comissaoIndicacao;
 
   function adicionarAmbiente() {
     setAmbientes((prev) => [...prev, { id: uuidv4(), nome: "Novo ambiente", itens: [] }]);
@@ -74,7 +84,7 @@ export default function OrcamentoForm({ orcamentoInicial, titulo, subtitulo }: P
             palhaNaturalValor: 0
           },
           regiao,
-          comissaoRT
+          comissaoTotal
         )
       )
     }));
@@ -106,10 +116,13 @@ export default function OrcamentoForm({ orcamentoInicial, titulo, subtitulo }: P
       observacoes,
       desconto,
       prazoEntrega,
+      formaPagamento,
       possuiArquiteto,
       nomeArquiteto: possuiArquiteto ? nomeArquiteto : "",
       telefoneArquiteto: possuiArquiteto ? telefoneArquiteto : "",
       comissaoRT: possuiArquiteto ? comissaoRT : 0,
+      nomeIndicacao,
+      comissaoIndicacao,
       ambientes,
       valorTotal: 0
     };
@@ -192,6 +205,7 @@ export default function OrcamentoForm({ orcamentoInicial, titulo, subtitulo }: P
         <ClienteForm cliente={cliente} onChange={setCliente} />
         <RegiaoSelector regiao={regiao} onChange={setRegiao} />
         <PrazoEntregaSelector prazoEntrega={prazoEntrega} onChange={setPrazoEntrega} />
+        <FormaPagamentoSelector formaPagamento={formaPagamento} onChange={setFormaPagamento} />
         <ArquitetoForm
           possuiArquiteto={possuiArquiteto}
           nomeArquiteto={nomeArquiteto}
@@ -201,6 +215,12 @@ export default function OrcamentoForm({ orcamentoInicial, titulo, subtitulo }: P
           onChangeNome={setNomeArquiteto}
           onChangeTelefone={setTelefoneArquiteto}
           onChangeComissaoRT={setComissaoRT}
+        />
+        <IndicacaoForm
+          nomeIndicacao={nomeIndicacao}
+          comissaoIndicacao={comissaoIndicacao}
+          onChangeNome={setNomeIndicacao}
+          onChangeComissao={setComissaoIndicacao}
         />
         <UploadProjeto onAnalise={aplicarAnaliseIA} onArquivoSelecionado={setArquivoProjeto} />
 
@@ -226,7 +246,7 @@ export default function OrcamentoForm({ orcamentoInicial, titulo, subtitulo }: P
               key={ambiente.id}
               ambiente={ambiente}
               regiao={regiao}
-              comissaoRT={comissaoRT}
+              comissaoRT={comissaoTotal}
               onChange={atualizarAmbiente}
               onRemover={() => removerAmbiente(ambiente.id)}
             />

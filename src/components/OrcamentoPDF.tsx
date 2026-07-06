@@ -149,7 +149,7 @@ function descricaoAdicionais(item: Orcamento["ambientes"][number]["itens"][numbe
   const partes: string[] = [];
   if (item.portasEspelhoQtd > 0) partes.push(`${item.portasEspelhoQtd}x porta espelho`);
   if (item.ledMetros > 0) partes.push(`LED ${item.ledMetros}m`);
- if (item.tapecaria) partes.push("Tapeçaria");
+  if (item.tapecaria) partes.push("Tapeçaria");
   if (item.serralheriaValor > 0) partes.push("Serralheria");
   if (item.palhaSinteticaValor > 0) partes.push("Palha sintética");
   if (item.palhaNaturalValor > 0) partes.push("Palha natural");
@@ -261,7 +261,8 @@ export default function OrcamentoPDF({ orcamento }: { orcamento: Orcamento }) {
         {/* Condições de pagamento, prazo e validade */}
         <View style={styles.condicoesBox}>
           <View style={styles.condicaoCard}>
-           <Text style={styles.condicaoTexto}>
+            <Text style={styles.condicaoTitulo}>Condições de pagamento</Text>
+            <Text style={styles.condicaoTexto}>
               {condicaoPagamento.texto}
             </Text>
           </View>
