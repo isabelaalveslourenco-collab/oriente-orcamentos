@@ -73,6 +73,8 @@ export default function ArquitetoForm({
                 value={nomeArquiteto}
                 onChange={(e) => onChangeNome(e.target.value)}
                 placeholder="Ex: Ana Souza"
+                spellCheck
+                lang="pt-BR"
               />
             </label>
             <label className="flex flex-col gap-1.5">

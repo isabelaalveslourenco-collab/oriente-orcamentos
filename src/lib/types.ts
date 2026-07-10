@@ -11,7 +11,9 @@ export type TipoAcabamento =
   | "branco_branco_oculta"
   | "colorido_colorido_oculta"
   | "laqueado"
-  | "cabeceira_mdf";
+  | "cabeceira_mdf"
+  | "painel_revestimento_parede"
+  | "painel_revestimento_parede_porta_mimetizada";
 
 export type FormaPagamento =
   | "entrada_40_3x"
@@ -48,6 +50,13 @@ export interface ItemOrcamento {
   serralheriaValor: number;
   palhaSinteticaValor: number;
   palhaNaturalValor: number;
+  portasMimetizadasQtd: number;
+  portasMimetizadasValorUnitario: number; // valor por porta, 100% editável (sem padrão)
+  portasMimetizadasValor: number; // portasMimetizadasQtd * portasMimetizadasValorUnitario
+
+  // Se false, o tipo de acabamento deste item não é impresso no PDF final
+  // (o item continua exigindo um acabamento selecionado na tela).
+  mostrarAcabamentoPdf: boolean;
 
   valorTotal: number; // valorBase + adicionais
 }
@@ -75,23 +84,7 @@ export interface Orcamento {
   nomeIndicacao?: string; // quem indicou o cliente/projeto — uso interno, nunca aparece no PDF
   comissaoIndicacao: number; // percentual de comissão da indicação — uso interno, nunca aparece no PDF
   ambientes: Ambiente[];
-  arquivoProjetoUrl?: string;
   valorTotal: number;
   createdAt?: string;
   updatedAt?: string;
-}
-
-// Estrutura que a IA deve retornar ao analisar um projeto anexado
-export interface AnaliseIAResultado {
-  ambientes: {
-    nome: string;
-    itens: {
-      descricao: string;
-      tipoAcabamentoSugerido: TipoAcabamento;
-      larguraM: number;
-      alturaM: number;
-      observacao?: string;
-    }[];
-  }[];
-  resumo: string;
 }

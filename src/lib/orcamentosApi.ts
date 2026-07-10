@@ -60,8 +60,7 @@ export async function salvarOrcamento(orcamento: Orcamento): Promise<{ id: strin
         forma_pagamento: orcamento.formaPagamento,
         nome_indicacao: orcamento.nomeIndicacao || null,
         comissao_indicacao: orcamento.comissaoIndicacao || 0,
-        valor_total: valorTotal,
-        arquivo_projeto_url: orcamento.arquivoProjetoUrl || null
+        valor_total: valorTotal
       })
       .select("id, numero")
       .single();
@@ -85,8 +84,7 @@ export async function salvarOrcamento(orcamento: Orcamento): Promise<{ id: strin
         forma_pagamento: orcamento.formaPagamento,
         nome_indicacao: orcamento.nomeIndicacao || null,
         comissao_indicacao: orcamento.comissaoIndicacao || 0,
-        valor_total: valorTotal,
-        arquivo_projeto_url: orcamento.arquivoProjetoUrl || null
+        valor_total: valorTotal
       })
       .eq("id", orcamentoId);
     if (orcUpdateError) throw orcUpdateError;
@@ -140,6 +138,10 @@ export async function salvarOrcamento(orcamento: Orcamento): Promise<{ id: strin
         serralheria_valor: item.serralheriaValor,
         palha_sintetica_valor: item.palhaSinteticaValor,
         palha_natural_valor: item.palhaNaturalValor,
+        portas_mimetizadas_qtd: item.portasMimetizadasQtd,
+        portas_mimetizadas_valor_unitario: item.portasMimetizadasValorUnitario,
+        portas_mimetizadas_valor: item.portasMimetizadasValor,
+        mostrar_acabamento_pdf: item.mostrarAcabamentoPdf,
         valor_total: item.valorTotal,
         ordem
       }));
@@ -258,6 +260,10 @@ export async function carregarOrcamento(id: string): Promise<Orcamento> {
           serralheriaValor: Number(item.serralheria_valor),
           palhaSinteticaValor: Number(item.palha_sintetica_valor) || 0,
           palhaNaturalValor: Number(item.palha_natural_valor) || 0,
+          portasMimetizadasQtd: Number(item.portas_mimetizadas_qtd) || 0,
+          portasMimetizadasValorUnitario: Number(item.portas_mimetizadas_valor_unitario) || 0,
+          portasMimetizadasValor: Number(item.portas_mimetizadas_valor) || 0,
+          mostrarAcabamentoPdf: item.mostrar_acabamento_pdf ?? true,
           valorTotal: Number(item.valor_total)
         })
       )
@@ -280,7 +286,6 @@ export async function carregarOrcamento(id: string): Promise<Orcamento> {
     nomeIndicacao: orcData.nome_indicacao || "",
     comissaoIndicacao: Number(orcData.comissao_indicacao) || 0,
     ambientes,
-    arquivoProjetoUrl: orcData.arquivo_projeto_url || undefined,
     valorTotal: Number(orcData.valor_total),
     createdAt: orcData.created_at,
     updatedAt: orcData.updated_at
@@ -294,20 +299,4 @@ export async function carregarOrcamento(id: string): Promise<Orcamento> {
 export async function excluirOrcamento(id: string): Promise<void> {
   const { error } = await supabase.from("orcamentos").delete().eq("id", id);
   if (error) throw error;
-}
-
-// =========================================================
-// Upload do arquivo de projeto (PDF/imagem) para o Storage
-// =========================================================
-
-export async function enviarArquivoProjeto(file: File): Promise<string> {
-  const nomeArquivo = `${Date.now()}-${file.name.replace(/\s+/g, "-")}`;
-  const { error } = await supabase.storage.from("projetos").upload(nomeArquivo, file, {
-    cacheControl: "3600",
-    upsert: false
-  });
-  if (error) throw error;
-
-  const { data } = supabase.storage.from("projetos").getPublicUrl(nomeArquivo);
-  return data.publicUrl;
 }

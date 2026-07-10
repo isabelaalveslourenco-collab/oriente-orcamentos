@@ -22,6 +22,8 @@ export default function ClienteForm({ cliente, onChange }: Props) {
             value={cliente.nome}
             onChange={(e) => atualizar("nome", e.target.value)}
             placeholder="Ex: Maria"
+            spellCheck
+            lang="pt-BR"
           />
         </Campo>
         <Campo label="Sobrenome" required>
@@ -30,6 +32,8 @@ export default function ClienteForm({ cliente, onChange }: Props) {
             value={cliente.sobrenome}
             onChange={(e) => atualizar("sobrenome", e.target.value)}
             placeholder="Ex: Oliveira"
+            spellCheck
+            lang="pt-BR"
           />
         </Campo>
         <Campo label="Endereço">
@@ -38,6 +42,8 @@ export default function ClienteForm({ cliente, onChange }: Props) {
             value={cliente.endereco}
             onChange={(e) => atualizar("endereco", e.target.value)}
             placeholder="Rua, número, bairro, cidade"
+            spellCheck
+            lang="pt-BR"
           />
         </Campo>
         <Campo label="Telefone">

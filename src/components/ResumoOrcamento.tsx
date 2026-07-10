@@ -67,6 +67,8 @@ export default function ResumoOrcamento({
           value={observacoes}
           onChange={(e) => onObservacoesChange(e.target.value)}
           placeholder="Condições de pagamento, prazo de entrega, etc."
+          spellCheck
+          lang="pt-BR"
         />
       </label>
 

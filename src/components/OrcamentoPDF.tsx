@@ -153,6 +153,7 @@ function descricaoAdicionais(item: Orcamento["ambientes"][number]["itens"][numbe
   if (item.serralheriaValor > 0) partes.push("Serralheria");
   if (item.palhaSinteticaValor > 0) partes.push("Palha sintética");
   if (item.palhaNaturalValor > 0) partes.push("Palha natural");
+  if (item.portasMimetizadasQtd > 0) partes.push(`${item.portasMimetizadasQtd}x porta mimetizada`);
   return partes.length > 0 ? partes.join(" · ") : "—";
 }
 
@@ -223,9 +224,11 @@ export default function OrcamentoPDF({ orcamento }: { orcamento: Orcamento }) {
               <View key={item.id} style={styles.tabelaRow}>
                 <View style={styles.colDescricao}>
                   <Text style={styles.itemDescricao}>{item.descricao || "Item"}</Text>
-                  <Text style={styles.itemDetalhe}>
-                    {TABELA_PRECOS[orcamento.regiao][item.tipoAcabamento].label}
-                  </Text>
+                  {item.mostrarAcabamentoPdf && (
+                    <Text style={styles.itemDetalhe}>
+                      {TABELA_PRECOS[orcamento.regiao][item.tipoAcabamento].label}
+                    </Text>
+                  )}
                 </View>
                 <Text style={[styles.colAdicionais, { fontSize: 8 }]}>{descricaoAdicionais(item)}</Text>
                 <Text style={[styles.colValor, { fontSize: 9, fontWeight: 700 }]}>

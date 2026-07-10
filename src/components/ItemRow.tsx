@@ -25,8 +25,8 @@ export default function ItemRow({ item, regiao, comissaoRT, onChange, onRemover 
   const [palhaSinteticaAtiva, setPalhaSinteticaAtiva] = useState(item.palhaSinteticaValor > 0);
   const [palhaNaturalAtiva, setPalhaNaturalAtiva] = useState(item.palhaNaturalValor > 0);
   const faixa = TABELA_PRECOS[regiao][item.tipoAcabamento];
-  const faixaTemVariacao = faixa.valorMin !== faixa.valorMax || faixa.editavel;
   const adicionaisRegiao = ADICIONAIS[regiao];
+  const temPortaMimetizada = item.tipoAcabamento === "painel_revestimento_parede_porta_mimetizada";
 
   function recalcular(campos: Partial<{
     descricao: string;
@@ -42,6 +42,9 @@ export default function ItemRow({ item, regiao, comissaoRT, onChange, onRemover 
     serralheriaValor: number;
     palhaSinteticaValor: number;
     palhaNaturalValor: number;
+    portasMimetizadasQtd: number;
+    portasMimetizadasValorUnitario: number;
+    mostrarAcabamentoPdf: boolean;
   }>) {
     const novoItem = calcularItem(
       {
@@ -62,7 +65,11 @@ export default function ItemRow({ item, regiao, comissaoRT, onChange, onRemover 
           (adicionaisRegiao.tapecariaFixa === null ? item.tapecariaValor : undefined),
         serralheriaValor: campos.serralheriaValor ?? item.serralheriaValor,
         palhaSinteticaValor: campos.palhaSinteticaValor ?? item.palhaSinteticaValor,
-        palhaNaturalValor: campos.palhaNaturalValor ?? item.palhaNaturalValor
+        palhaNaturalValor: campos.palhaNaturalValor ?? item.palhaNaturalValor,
+        portasMimetizadasQtd: campos.portasMimetizadasQtd ?? item.portasMimetizadasQtd,
+        portasMimetizadasValorUnitario:
+          campos.portasMimetizadasValorUnitario ?? item.portasMimetizadasValorUnitario,
+        mostrarAcabamentoPdf: campos.mostrarAcabamentoPdf ?? item.mostrarAcabamentoPdf
       },
       regiao,
       comissaoRT
@@ -107,6 +114,8 @@ export default function ItemRow({ item, regiao, comissaoRT, onChange, onRemover 
               value={item.descricao}
               onChange={(e) => recalcular({ descricao: e.target.value })}
               placeholder="Ex: Armário planejado do quarto"
+              spellCheck
+              lang="pt-BR"
             />
           </Campo>
 
@@ -128,6 +137,16 @@ export default function ItemRow({ item, regiao, comissaoRT, onChange, onRemover 
               ))}
             </select>
           </Campo>
+
+          <label className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={item.mostrarAcabamentoPdf}
+              onChange={(e) => recalcular({ mostrarAcabamentoPdf: e.target.checked })}
+              className="h-4 w-4 accent-oriente-red"
+            />
+            <span className="text-sm text-oriente-gray">Mostrar tipo de acabamento no PDF final</span>
+          </label>
 
           <div className="grid grid-cols-2 gap-3">
             <Campo label="Largura (m)">
@@ -159,22 +178,22 @@ export default function ItemRow({ item, regiao, comissaoRT, onChange, onRemover 
             <strong>{item.unidadeCalculo === "linear" ? "metro linear" : "metro quadrado"}</strong>.
           </p>
 
-          {faixaTemVariacao && (
-            <Campo label={`Valor por ${item.unidadeCalculo === "linear" ? "metro linear" : "m²"} (R$)`}>
-              <input
-                type="number"
-                min={0}
-                step={10}
-                className="input"
-                value={item.valorUnitario}
-                onChange={(e) => recalcular({ valorUnitarioPersonalizado: parseFloat(e.target.value) || 0 })}
-              />
+          <Campo label={`Valor por ${item.unidadeCalculo === "linear" ? "metro linear" : "m²"} (R$)`}>
+            <input
+              type="number"
+              min={0}
+              step={10}
+              className="input"
+              value={item.valorUnitario}
+              onChange={(e) => recalcular({ valorUnitarioPersonalizado: parseFloat(e.target.value) || 0 })}
+            />
+            {faixa.valorMin > 0 && (
               <span className="text-xs text-oriente-gray-light mt-1">
                 Faixa sugerida: {formatarMoeda(faixa.valorMin)}
                 {faixa.valorMax !== faixa.valorMin ? ` a ${formatarMoeda(faixa.valorMax)}` : ""}
               </span>
-            </Campo>
-          )}
+            )}
+          </Campo>
 
           <div className="border-t border-dashed border-neutral-200 pt-4">
             <h4 className="text-sm font-medium text-oriente-gray mb-3">Adicionais</h4>
@@ -202,6 +221,32 @@ export default function ItemRow({ item, regiao, comissaoRT, onChange, onRemover 
                 />
               </Campo>
             </div>
+
+            {temPortaMimetizada && (
+              <div className="grid grid-cols-2 gap-3 mt-3">
+                <Campo label="Quantidade de portas mimetizadas">
+                  <input
+                    type="number"
+                    min={0}
+                    className="input"
+                    value={item.portasMimetizadasQtd}
+                    onChange={(e) => recalcular({ portasMimetizadasQtd: parseInt(e.target.value) || 0 })}
+                  />
+                </Campo>
+                <Campo label="Valor por porta mimetizada (R$)">
+                  <input
+                    type="number"
+                    min={0}
+                    className="input"
+                    value={item.portasMimetizadasValorUnitario}
+                    onChange={(e) =>
+                      recalcular({ portasMimetizadasValorUnitario: parseFloat(e.target.value) || 0 })
+                    }
+                    placeholder="0,00"
+                  />
+                </Campo>
+              </div>
+            )}
 
             <label className="flex items-center gap-2 mt-3">
               <input

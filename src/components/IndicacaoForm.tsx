@@ -31,6 +31,8 @@ export default function IndicacaoForm({
             value={nomeIndicacao}
             onChange={(e) => onChangeNome(e.target.value)}
             placeholder="Ex: João Silva"
+            spellCheck
+            lang="pt-BR"
           />
         </label>
 

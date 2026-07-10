@@ -29,8 +29,6 @@ create table if not exists orcamentos (
   observacoes text,
   desconto numeric(12,2) not null default 0,
   valor_total numeric(12,2) not null default 0,
-  arquivo_projeto_url text,                        -- PDF/imagem do projeto anexado
-  analise_ia jsonb,                                 -- resposta bruta da IA (auditoria)
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -70,6 +68,12 @@ create table if not exists itens (
   serralheria_valor numeric(12,2) not null default 0,
   palha_sintetica_valor numeric(12,2) not null default 0,
   palha_natural_valor numeric(12,2) not null default 0,
+  portas_mimetizadas_qtd integer not null default 0,
+  portas_mimetizadas_valor_unitario numeric(12,2) not null default 0,
+  portas_mimetizadas_valor numeric(12,2) not null default 0,
+
+  -- Se false, o tipo de acabamento deste item não é impresso no PDF final.
+  mostrar_acabamento_pdf boolean not null default true,
 
   valor_total numeric(12,2) not null default 0,       -- valor_base + adicionais
   ordem integer not null default 0
@@ -127,11 +131,3 @@ create policy "Usuarios autenticados podem tudo - itens"
   on itens for all
   using (auth.role() = 'authenticated')
   with check (auth.role() = 'authenticated');
-
--- ---------------------------------------------------------
--- Storage bucket para os projetos anexados (PDF/imagens)
--- Rode isso no SQL editor OU crie o bucket "projetos" pela UI do Supabase.
--- ---------------------------------------------------------
-insert into storage.buckets (id, name, public)
-values ('projetos', 'projetos', true)
-on conflict (id) do nothing;

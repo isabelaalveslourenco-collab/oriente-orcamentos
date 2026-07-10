@@ -51,6 +51,18 @@ export const TABELA_PRECOS: Record<Regiao, TabelaPrecos> = {
       label: "Cabeceira em MDF padrão",
       valorMin: 2000,
       valorMax: 3000
+    },
+    painel_revestimento_parede: {
+      label: "Painel revestimento de parede",
+      valorMin: 0,
+      valorMax: 0,
+      editavel: true
+    },
+    painel_revestimento_parede_porta_mimetizada: {
+      label: "Painel revestimento de parede com porta mimetizada",
+      valorMin: 0,
+      valorMax: 0,
+      editavel: true
     }
   },
   sao_paulo: {
@@ -88,6 +100,18 @@ export const TABELA_PRECOS: Record<Regiao, TabelaPrecos> = {
       label: "Cabeceira em MDF padrão (a partir de)",
       valorMin: 4000,
       valorMax: 4000,
+      editavel: true
+    },
+    painel_revestimento_parede: {
+      label: "Painel revestimento de parede",
+      valorMin: 0,
+      valorMax: 0,
+      editavel: true
+    },
+    painel_revestimento_parede_porta_mimetizada: {
+      label: "Painel revestimento de parede com porta mimetizada",
+      valorMin: 0,
+      valorMax: 0,
       editavel: true
     }
   }
@@ -170,7 +194,12 @@ export const TIPO_ACABAMENTO_OPCOES: { value: TipoAcabamento; label: string }[] 
   { value: "branco_branco_oculta", label: "Externo branco / interno branco / corrediça oculta" },
   { value: "colorido_colorido_oculta", label: "Externo colorido / interno colorido / corrediça oculta" },
   { value: "laqueado", label: "Móvel laqueado" },
-  { value: "cabeceira_mdf", label: "Cabeceira em MDF padrão" }
+  { value: "cabeceira_mdf", label: "Cabeceira em MDF padrão" },
+  { value: "painel_revestimento_parede", label: "Painel revestimento de parede" },
+  {
+    value: "painel_revestimento_parede_porta_mimetizada",
+    label: "Painel revestimento de parede com porta mimetizada"
+  }
 ];
 
 // =========================================================
@@ -223,6 +252,9 @@ export interface EntradaCalculoItem {
   serralheriaValor?: number;
   palhaSinteticaValor?: number;
   palhaNaturalValor?: number;
+  portasMimetizadasQtd?: number;
+  portasMimetizadasValorUnitario?: number; // valor por porta, 100% editável (sem padrão)
+  mostrarAcabamentoPdf?: boolean; // default true
 }
 
 export function calcularItem(
@@ -258,9 +290,17 @@ export function calcularItem(
   const palhaSinteticaValor = Number((entrada.palhaSinteticaValor || 0).toFixed(2));
   const palhaNaturalValor = Number((entrada.palhaNaturalValor || 0).toFixed(2));
 
+  const portasMimetizadasQtd = entrada.portasMimetizadasQtd || 0;
+  const portasMimetizadasValorUnitario = entrada.portasMimetizadasValorUnitario || 0;
+  const portasMimetizadasValor = Number(
+    (portasMimetizadasQtd * portasMimetizadasValorUnitario).toFixed(2)
+  );
+
+  const mostrarAcabamentoPdf = entrada.mostrarAcabamentoPdf ?? true;
+
   const subtotalSemComissao =
     valorBase + portasEspelhoValor + ledValor + tapecariaValor + serralheriaValor +
-    palhaSinteticaValor + palhaNaturalValor;
+    palhaSinteticaValor + palhaNaturalValor + portasMimetizadasValor;
 
   // A comissão de RT (reserva técnica do arquiteto) é distribuída proporcionalmente
   // dentro do próprio valor do item — não aparece como uma linha separada em lugar
@@ -288,6 +328,10 @@ export function calcularItem(
     serralheriaValor,
     palhaSinteticaValor,
     palhaNaturalValor,
+    portasMimetizadasQtd,
+    portasMimetizadasValorUnitario,
+    portasMimetizadasValor,
+    mostrarAcabamentoPdf,
     valorTotal
   };
 }

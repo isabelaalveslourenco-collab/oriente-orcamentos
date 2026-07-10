@@ -8,12 +8,11 @@ import PrazoEntregaSelector from "@/components/PrazoEntregaSelector";
 import FormaPagamentoSelector from "@/components/FormaPagamentoSelector";
 import ArquitetoForm from "@/components/ArquitetoForm";
 import IndicacaoForm from "@/components/IndicacaoForm";
-import UploadProjeto from "@/components/UploadProjeto";
 import AmbienteCard from "@/components/AmbienteCard";
 import ResumoOrcamento from "@/components/ResumoOrcamento";
-import { Ambiente, AnaliseIAResultado, Cliente, FormaPagamento, ItemOrcamento, Orcamento, Regiao } from "@/lib/types";
-import { FORMA_PAGAMENTO_PADRAO, PRAZO_ENTREGA_PADRAO, calcularItem } from "@/lib/pricing";
-import { enviarArquivoProjeto, salvarOrcamento } from "@/lib/orcamentosApi";
+import { Ambiente, Cliente, FormaPagamento, Orcamento, Regiao } from "@/lib/types";
+import { FORMA_PAGAMENTO_PADRAO, PRAZO_ENTREGA_PADRAO } from "@/lib/pricing";
+import { salvarOrcamento } from "@/lib/orcamentosApi";
 import { exportarOrcamentoPdf } from "@/lib/pdfExport";
 
 const CLIENTE_VAZIO: Cliente = { nome: "", sobrenome: "", endereco: "", telefone: "" };
@@ -42,7 +41,6 @@ export default function OrcamentoForm({ orcamentoInicial, titulo, subtitulo }: P
   const [nomeIndicacao, setNomeIndicacao] = useState(orcamentoInicial?.nomeIndicacao || "");
   const [comissaoIndicacao, setComissaoIndicacao] = useState(orcamentoInicial?.comissaoIndicacao || 0);
   const [observacoes, setObservacoes] = useState(orcamentoInicial?.observacoes || "");
-  const [arquivoProjeto, setArquivoProjeto] = useState<File | null>(null);
 
   const [salvando, setSalvando] = useState(false);
   const [exportando, setExportando] = useState(false);
@@ -61,39 +59,6 @@ export default function OrcamentoForm({ orcamentoInicial, titulo, subtitulo }: P
 
   function removerAmbiente(id: string) {
     setAmbientes((prev) => prev.filter((a) => a.id !== id));
-  }
-
-  function aplicarAnaliseIA(resultado: AnaliseIAResultado) {
-    const novosAmbientes: Ambiente[] = resultado.ambientes.map((amb) => ({
-      id: uuidv4(),
-      nome: amb.nome,
-      itens: amb.itens.map((item): ItemOrcamento =>
-        calcularItem(
-          {
-            id: uuidv4(),
-            ambienteNome: amb.nome,
-            descricao: item.descricao,
-            tipoAcabamento: item.tipoAcabamentoSugerido,
-            larguraM: item.larguraM,
-            alturaM: item.alturaM,
-            portasEspelhoQtd: 0,
-            ledMetros: 0,
-            tapecaria: false,
-            serralheriaValor: 0,
-            palhaSinteticaValor: 0,
-            palhaNaturalValor: 0
-          },
-          regiao,
-          comissaoTotal
-        )
-      )
-    }));
-
-    setAmbientes((prev) => [...prev, ...novosAmbientes]);
-    setMensagem({
-      tipo: "sucesso",
-      texto: `IA identificou ${novosAmbientes.length} ambiente(s). Revise as medidas e acabamentos antes de finalizar.`
-    });
   }
 
   function validarAntesDesalvar(): string | null {
@@ -128,12 +93,8 @@ export default function OrcamentoForm({ orcamentoInicial, titulo, subtitulo }: P
     };
   }
 
-  async function salvarComArquivo(): Promise<Orcamento> {
-    let arquivoProjetoUrl = orcamentoInicial?.arquivoProjetoUrl;
-    if (arquivoProjeto) {
-      arquivoProjetoUrl = await enviarArquivoProjeto(arquivoProjeto);
-    }
-    const orcamento = { ...montarOrcamento(), arquivoProjetoUrl };
+  async function salvar(): Promise<Orcamento> {
+    const orcamento = montarOrcamento();
     const resultado = await salvarOrcamento(orcamento);
     setOrcamentoId(resultado.id);
     setNumero(resultado.numero);
@@ -149,7 +110,7 @@ export default function OrcamentoForm({ orcamentoInicial, titulo, subtitulo }: P
     setSalvando(true);
     setMensagem(null);
     try {
-      const salvo = await salvarComArquivo();
+      const salvo = await salvar();
       setMensagem({ tipo: "sucesso", texto: `Orçamento #${salvo.numero} salvo com sucesso.` });
     } catch (e: any) {
       setMensagem({ tipo: "erro", texto: e.message || "Erro ao salvar o orçamento." });
@@ -167,9 +128,13 @@ export default function OrcamentoForm({ orcamentoInicial, titulo, subtitulo }: P
     setExportando(true);
     setMensagem(null);
     try {
-      const salvo = await salvarComArquivo();
-      await exportarOrcamentoPdf(salvo);
-      setMensagem({ tipo: "sucesso", texto: `Orçamento #${salvo.numero} salvo e PDF exportado.` });
+      const salvo = await salvar();
+      const exportado = await exportarOrcamentoPdf(salvo);
+      setMensagem(
+        exportado
+          ? { tipo: "sucesso", texto: `Orçamento #${salvo.numero} salvo e PDF exportado.` }
+          : { tipo: "sucesso", texto: `Orçamento #${salvo.numero} salvo. Exportação do PDF cancelada.` }
+      );
     } catch (e: any) {
       setMensagem({ tipo: "erro", texto: e.message || "Erro ao exportar o PDF." });
     } finally {
@@ -222,8 +187,6 @@ export default function OrcamentoForm({ orcamentoInicial, titulo, subtitulo }: P
           onChangeNome={setNomeIndicacao}
           onChangeComissao={setComissaoIndicacao}
         />
-        <UploadProjeto onAnalise={aplicarAnaliseIA} onArquivoSelecionado={setArquivoProjeto} />
-
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="font-secundaria text-lg text-oriente-gray">Ambientes e itens</h2>
@@ -235,8 +198,7 @@ export default function OrcamentoForm({ orcamentoInicial, titulo, subtitulo }: P
           {ambientes.length === 0 && (
             <div className="card text-center py-10">
               <p className="text-sm text-oriente-gray-light">
-                Nenhum ambiente ainda. Adicione manualmente ou anexe um projeto para a IA preencher
-                automaticamente.
+                Nenhum ambiente ainda. Clique em &quot;Adicionar ambiente&quot; para começar.
               </p>
             </div>
           )}

@@ -28,7 +28,10 @@ export default function AmbienteCard({ ambiente, regiao, comissaoRT, onChange, o
         tapecaria: false,
         serralheriaValor: 0,
         palhaSinteticaValor: 0,
-        palhaNaturalValor: 0
+        palhaNaturalValor: 0,
+        portasMimetizadasQtd: 0,
+        portasMimetizadasValorUnitario: 0,
+        mostrarAcabamentoPdf: true
       },
       regiao,
       comissaoRT
@@ -70,7 +73,7 @@ export default function AmbienteCard({ ambiente, regiao, comissaoRT, onChange, o
       <div className="space-y-2">
         {ambiente.itens.length === 0 && (
           <p className="text-sm text-oriente-gray-light py-3">
-            Nenhum item ainda. Adicione um móvel manualmente ou use a leitura por IA.
+            Nenhum item ainda. Adicione um móvel manualmente.
           </p>
         )}
         {ambiente.itens.map((item) => (
